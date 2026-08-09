@@ -123,14 +123,14 @@ def main() -> None:
             input=input_payload,
             response_format={
                 "type": "image",
-                "mime_type": "image/png",
+                "mime_type": "image/jpeg",
                 "aspect_ratio": "16:9",
                 "image_size": args.image_size,
             },
         )
 
         image_bytes = extract_image_bytes(interaction)
-        out_path = out_dir / f"LFV_{args.shot}_candidate_v{variant:02d}_{timestamp}.png"
+        out_path = out_dir / f"LFV_{args.shot}_candidate_v{variant:02d}_{timestamp}.jpg"
         out_path.write_bytes(image_bytes)
         prompt_path = out_dir / f"LFV_{args.shot}_candidate_v{variant:02d}_{timestamp}_prompt.txt"
         prompt_path.write_text(prompt, encoding="utf-8")
