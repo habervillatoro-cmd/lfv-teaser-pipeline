@@ -1,0 +1,60 @@
+name: Generate LFV Image with Gemini
+
+on:
+  workflow_dispatch:
+    inputs:
+      shot:
+        description: "Plano a generar"
+        required: true
+        default: "P04"
+        type: choice
+        options:
+          - P04
+          - P05
+      variants:
+        description: "Cantidad de candidatos"
+        required: true
+        default: "2"
+      model:
+        description: "Modelo Gemini Image"
+        required: true
+        default: "gemini-3.1-flash-image"
+      image_size:
+        description: "Tamaño de salida"
+        required: true
+        default: "1K"
+        type: choice
+        options:
+          - "512"
+          - "1K"
+          - "2K"
+          - "4K"
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Generate image candidates
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          python scripts/generate_image_gemini.py             --shot "${{ inputs.shot }}"             --variants "${{ inputs.variants }}"             --model "${{ inputs.model }}"             --image-size "${{ inputs.image_size }}"
+
+      - name: Upload generated candidates
+        uses: actions/upload-artifact@v4
+        with:
+          name: lfv-${{ inputs.shot }}-candidates
+          path: outputs/
+          if-no-files-found: error
